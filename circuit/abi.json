@@ -1,0 +1,25 @@
+{
+  "inputs": [
+    {
+      "name": "p",
+      "public": false,
+      "type": "field"
+    },
+    {
+      "name": "q",
+      "public": false,
+      "type": "field"
+    },
+    {
+      "name": "n",
+      "public": true,
+      "type": "field"
+    }
+  ],
+  "output": {
+    "type": "tuple",
+    "components": {
+      "elements": []
+    }
+  }
+}

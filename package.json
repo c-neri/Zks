@@ -1,0 +1,52 @@
+{
+  "name": "HH-ZK",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "tau:start": "snarkjs powersoftau new bn128 12 ./circuits/tau/pot12_0000.ptau -v",
+    "tau:contribute": "snarkjs powersoftau contribute ./circuits/tau/pot12_0000.ptau ./circuits/tau/pot12_0001.ptau --name='First contribution' -v",
+    "tau:ceremony": "snarkjs powersoftau prepare phase2 ./circuits/tau/pot12_0001.ptau ./circuits/tau/pot12_final.ptau -v",
+    "tau:verify-setup": "snarkjs powersoftau verify ./circuits/tau/pot12_final.ptau",
+    "tau": "yarn tau:start && yarn tau:contribute && yarn tau:ceremony && yarn tau:verify-setup",
+    "compile": "circom ./circuits/multiplier.circom --r1cs --wasm -o ./circuits/build/",
+    "generate:witness": "node ./circuits/build/multiplier_js/generate_witness.js ./circuits/build/multiplier_js/multiplier.wasm ./circuits/input.json ./circuits/build/witness.wtns",
+    "snark:gen:keys": "snarkjs groth16 setup ./circuits/build/multiplier.r1cs ./circuits/tau/pot12_final.ptau ./circuits/keys/multiplier_0000.key",
+    "snark:gen:keys:contribute": "snarkjs zkey contribute ./circuits/keys/multiplier_0000.key ./circuits/keys/multiplier_0001.key --name='1st Contributor'",
+    "snark:gen:keys:export": "snarkjs zkey export verificationkey ./circuits/keys/multiplier_0001.key ./circuits/keys/verification_key.json --name='1st Contributor'",
+    "snark:gen:proof": "snarkjs groth16 prove ./circuits/keys/multiplier_0001.key ./circuits/build/witness.wtns ./circuits/proof.json ./circuits/public.json",
+    "snark:verify": "snarkjs groth16 verify ./circuits/keys/verification_key.json ./circuits/public.json  ./circuits/proof.json",
+    "snark:gen:solidity-verifier": "snarkjs zkey export solidityverifier ./circuits/keys/multiplier_0001.key ./contracts/Verifier.sol",
+    "build": "yarn tau && yarn compile && yarn generate:witness && yarn snark:gen:keys&& yarn snark:gen:keys:contribute && snark:gen:keys:export && yarn snark:gen:proof && yarn snark:verify && yarn snark:gen:solidity-verifier"
+  },
+  "devDependencies": {
+    "@ethersproject/abi": "^5.4.7",
+    "@ethersproject/providers": "^5.4.7",
+    "@nomicfoundation/hardhat-chai-matchers": "^1.0.0",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
+    "@nomicfoundation/hardhat-toolbox": "^2.0.0",
+    "@nomiclabs/hardhat-ethers": "npm:hardhat-deploy-ethers",
+    "@nomiclabs/hardhat-etherscan": "^3.0.0",
+    "@openzeppelin/contracts": "^4.7.3",
+    "@typechain/ethers-v5": "^10.1.0",
+    "@typechain/hardhat": "^6.1.2",
+    "@types/chai": "^4.2.0",
+    "@types/fs-extra": "^11.0.1",
+    "@types/mocha": "^9.1.0",
+    "@types/node": ">=12.0.0",
+    "chai": "^4.2.0",
+    "ethers": "^5.7.1",
+    "ganache-cli": "^6.12.2",
+    "hardhat-deploy": "^0.11.15",
+    "hardhat-gas-reporter": "^1.0.8",
+    "snarkjs": "^0.6.4",
+    "solidity-coverage": "^0.8.2",
+    "ts-node": ">=8.0.0",
+    "typechain": "^8.1.0",
+    "typescript": ">=4.5.0"
+  },
+  "dependencies": {
+    "hardhat": "^2.12.7",
+    "zokrates-js": "^1.1.5"
+  }
+}
