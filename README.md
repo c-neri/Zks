@@ -32,3 +32,9 @@ If private are keept secrets during the proof generation
 If witness is compromised i could get the real input
 
 
+HOW TEST IT
+`yarn hardhat node`
+Go to web folder:
+`yarn dev`
+
+
